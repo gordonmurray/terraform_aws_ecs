@@ -9,10 +9,11 @@ resource "aws_lb" "main" {
 }
 
 resource "aws_lb_target_group" "main" {
-  name     = "${var.application_name}-ecs-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc.id
+  name        = "${var.application_name}-ecs-target-group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
 
   health_check {
     interval            = 30
