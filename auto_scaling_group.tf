@@ -1,9 +1,14 @@
 resource "aws_autoscaling_group" "ecs" {
-  desired_capacity     = 1
-  max_size             = 2
-  min_size             = 1
-  launch_configuration = aws_launch_configuration.ecs.id
-  vpc_zone_identifier  = aws_subnet.private[*].id
+  name                = "${var.application_name}-ecs-asg"
+  desired_capacity    = 1
+  max_size            = 2
+  min_size            = 1
+  vpc_zone_identifier = aws_subnet.private[*].id
+  launch_template {
+    id      = aws_launch_template.ecs.id
+    version = "$Latest"
+  }
+
 
   tag {
     key                 = "Name"

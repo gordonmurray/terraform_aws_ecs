@@ -12,8 +12,8 @@ resource "aws_ecs_service" "main" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.main.arn
-    container_name   = "my-app" # Use the container name from the task definition
-    container_port   = 80
+    container_name   = "triton" # Use the container name from the task definition
+    container_port   = 8000
   }
 
   depends_on = [aws_lb_listener.http]

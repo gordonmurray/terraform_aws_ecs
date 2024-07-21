@@ -10,7 +10,7 @@ resource "aws_lb" "main" {
 
 resource "aws_lb_target_group" "main" {
   name        = "${var.application_name}-ecs-target-group"
-  port        = 80
+  port        = 8000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.vpc.id
   target_type = "ip"
@@ -27,7 +27,7 @@ resource "aws_lb_target_group" "main" {
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
-  port              = "80"
+  port              = "8000"
   protocol          = "HTTP"
 
   default_action {
