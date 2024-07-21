@@ -9,6 +9,7 @@ resource "aws_autoscaling_group" "ecs" {
     version = "$Latest"
   }
 
+  target_group_arns = [aws_lb_target_group.main.arn]
 
   tag {
     key                 = "Name"

@@ -11,13 +11,17 @@ data "aws_ami" "deep_learning_base" {
   owners = ["amazon"]
 }
 
-
 resource "aws_launch_template" "ecs" {
   name_prefix   = "${var.application_name}-ecs-launch-template"
   image_id      = data.aws_ami.deep_learning_base.id
   instance_type = "g5.xlarge"
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ecs_instance_profile.name
+  }
+
+  metadata_options {
+    http_tokens = "required"
   }
 
   network_interfaces {
@@ -28,6 +32,9 @@ resource "aws_launch_template" "ecs" {
   user_data = base64encode(<<-EOF
               #!/bin/bash
               echo ECS_CLUSTER=${aws_ecs_cluster.main.name} >> /etc/ecs/ecs.config
+              amazon-linux-extras install -y aws-ssm-agent
+              systemctl enable amazon-ssm-agent
+              systemctl start amazon-ssm-agent
               EOF
   )
 
@@ -38,6 +45,7 @@ resource "aws_launch_template" "ecs" {
     }
   }
 }
+
 
 
 resource "aws_iam_instance_profile" "ecs_instance_profile" {

@@ -13,7 +13,7 @@ resource "aws_lb_target_group" "main" {
   port        = 8000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.vpc.id
-  target_type = "ip"
+  target_type = "instance"
 
   health_check {
     interval            = 30
@@ -22,6 +22,7 @@ resource "aws_lb_target_group" "main" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     matcher             = "200"
+    port                = "8000"
   }
 }
 
