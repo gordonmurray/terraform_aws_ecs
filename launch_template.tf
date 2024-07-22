@@ -11,6 +11,15 @@ data "aws_ami" "deep_learning_base" {
   owners = ["amazon"]
 }
 
+# user data from a template file
+data "template_file" "user_data" {
+  template = file("${path.module}/scripts/user_data.sh.tpl")
+
+  vars = {
+    ecs_cluster = "my-ecs-app-ecs-cluster"
+  }
+}
+
 resource "aws_launch_template" "ecs" {
   name_prefix   = "${var.application_name}-ecs-launch-template"
   image_id      = data.aws_ami.deep_learning_base.id
@@ -29,26 +38,7 @@ resource "aws_launch_template" "ecs" {
     security_groups             = [aws_security_group.ecs_sg.id]
   }
 
-  user_data = base64encode(<<-EOF
-              #!/bin/bash
-              # Install Docker
-              amazon-linux-extras install -y docker
-              service docker start
-              usermod -a -G docker ec2-user
-
-              # Install ECS Agent
-              mkdir -p /etc/ecs
-              echo "ECS_CLUSTER=my-ecs-app-ecs-cluster" | sudo tee -a /etc/ecs/ecs.config
-              amazon-linux-extras install -y ecs
-              systemctl enable ecs
-              systemctl start ecs
-
-              # Install SSM Agent
-              amazon-linux-extras install -y aws-ssm-agent
-              systemctl enable amazon-ssm-agent
-              systemctl start amazon-ssm-agent
-              EOF
-  )
+  user_data = base64encode(data.template_file.user_data.rendered)
 
   tag_specifications {
     resource_type = "instance"
