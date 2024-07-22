@@ -4,13 +4,13 @@ resource "aws_autoscaling_group" "ecs" {
   max_size            = 2
   min_size            = 1
   vpc_zone_identifier = aws_subnet.private[*].id
+
   launch_template {
     id      = aws_launch_template.ecs.id
     version = "$Latest"
   }
 
   target_group_arns = [
-    aws_lb_target_group.main.arn,
     aws_lb_target_group.nginx.arn
   ]
 
