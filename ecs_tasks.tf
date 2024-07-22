@@ -45,8 +45,8 @@ resource "aws_ecs_task_definition" "main" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/triton"
-          "awslogs-region"        = "us-west-2"
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_log_group.name
+          "awslogs-region"        = "${var.region}"
           "awslogs-stream-prefix" = "ecs"
         }
       }
@@ -63,8 +63,6 @@ resource "aws_ecs_task_definition" "main" {
     host_path = "models/model_cache"
   }
 }
-
-
 
 
 resource "aws_ecs_task_definition" "nginx" {
@@ -84,19 +82,19 @@ resource "aws_ecs_task_definition" "nginx" {
       portMappings = [
         {
           containerPort = 80
-          hostPort      = 80
+          hostPort      = 8080
         },
         {
           containerPort = 443
-          hostPort      = 443
+          hostPort      = 4443
         }
       ]
 
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/nginx"
-          "awslogs-region"        = "us-west-2"
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_log_group.name
+          "awslogs-region"        = "${var.region}"
           "awslogs-stream-prefix" = "ecs"
         }
       }

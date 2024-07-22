@@ -30,23 +30,23 @@ resource "aws_launch_template" "ecs" {
   }
 
   user_data = base64encode(<<-EOF
-      #!/bin/bash
-      # Install Docker
-      amazon-linux-extras install -y docker
-      service docker start
-      usermod -a -G docker ec2-user
+              #!/bin/bash
+              # Install Docker
+              amazon-linux-extras install -y docker
+              service docker start
+              usermod -a -G docker ec2-user
 
-      # Install ECS Agent
-      mkdir -p /etc/ecs
-      echo ECS_CLUSTER=my-ecs-app-ecs-cluster >> /etc/ecs/ecs.config
-      amazon-linux-extras install -y ecs
-      systemctl enable ecs
-      systemctl start ecs
+              # Install ECS Agent
+              mkdir -p /etc/ecs
+              echo "ECS_CLUSTER=my-ecs-app-ecs-cluster" | sudo tee -a /etc/ecs/ecs.config
+              amazon-linux-extras install -y ecs
+              systemctl enable ecs
+              systemctl start ecs
 
-      # Install SSM Agent
-      amazon-linux-extras install -y aws-ssm-agent
-      systemctl enable amazon-ssm-agent
-      systemctl start amazon-ssm-agent
+              # Install SSM Agent
+              amazon-linux-extras install -y aws-ssm-agent
+              systemctl enable amazon-ssm-agent
+              systemctl start amazon-ssm-agent
               EOF
   )
 
