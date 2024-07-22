@@ -30,11 +30,23 @@ resource "aws_launch_template" "ecs" {
   }
 
   user_data = base64encode(<<-EOF
-              #!/bin/bash
-              echo ECS_CLUSTER=${aws_ecs_cluster.main.name} >> /etc/ecs/ecs.config
-              amazon-linux-extras install -y aws-ssm-agent
-              systemctl enable amazon-ssm-agent
-              systemctl start amazon-ssm-agent
+      #!/bin/bash
+      # Install Docker
+      amazon-linux-extras install -y docker
+      service docker start
+      usermod -a -G docker ec2-user
+
+      # Install ECS Agent
+      mkdir -p /etc/ecs
+      echo ECS_CLUSTER=my-ecs-app-ecs-cluster >> /etc/ecs/ecs.config
+      amazon-linux-extras install -y ecs
+      systemctl enable ecs
+      systemctl start ecs
+
+      # Install SSM Agent
+      amazon-linux-extras install -y aws-ssm-agent
+      systemctl enable amazon-ssm-agent
+      systemctl start amazon-ssm-agent
               EOF
   )
 
@@ -44,11 +56,4 @@ resource "aws_launch_template" "ecs" {
       Name = "${var.application_name}-ecs-instance"
     }
   }
-}
-
-
-
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecsInstanceProfile"
-  role = aws_iam_role.ecs_instance_role.name
 }

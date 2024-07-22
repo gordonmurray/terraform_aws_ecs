@@ -63,3 +63,44 @@ resource "aws_ecs_task_definition" "main" {
     host_path = "models/model_cache"
   }
 }
+
+
+
+
+resource "aws_ecs_task_definition" "nginx" {
+  family                   = "nginx"
+  network_mode             = "bridge"
+  requires_compatibilities = ["EC2"]
+  cpu                      = "1024" # 1 vCPU
+  memory                   = "2048" # 2 GB
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task_execution.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "nginx"
+      image     = "${aws_ecr_repository.repository.repository_url}:latest"
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+        },
+        {
+          containerPort = 443
+          hostPort      = 443
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/nginx"
+          "awslogs-region"        = "us-west-2"
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
+    }
+  ])
+
+}

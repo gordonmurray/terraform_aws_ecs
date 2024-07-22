@@ -9,7 +9,10 @@ resource "aws_autoscaling_group" "ecs" {
     version = "$Latest"
   }
 
-  target_group_arns = [aws_lb_target_group.main.arn]
+  target_group_arns = [
+    aws_lb_target_group.main.arn,
+    aws_lb_target_group.nginx.arn
+  ]
 
   tag {
     key                 = "Name"
